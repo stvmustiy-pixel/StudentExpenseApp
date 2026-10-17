@@ -1,0 +1,43 @@
+name: Build Android APK
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ø¯Ø±ÛŒØ§ÙØª Ú©Ø¯Ù‡Ø§ÛŒ Ù¾Ø±ÙˆÚ˜Ù‡ (Checkout)
+        uses: actions/checkout@v4
+
+      - name: Ù†ØµØ¨ Ø¬Ø§ÙˆØ§ Û±Û· (Setup JDK 17)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Ù†ØµØ¨ Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.4'
+
+      - name: Ú©Ø§Ù…Ù¾Ø§ÛŒÙ„ Ùˆ Ø³Ø§Ø®Øª Ù†Ø³Ø®Ù‡ Debug APK
+        run: |
+          gradle assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk StudentExpense-v1.apk
+
+      - name: Ø³Ø§Ø®Øª Ù„ÛŒÙ†Ú© Ø¯Ø§Ù†Ù„ÙˆØ¯ Ù…Ø³ØªÙ‚ÛŒÙ… Ø¯Ø± Ø¨Ø®Ø´ Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: "Ù†Ø³Ø®Ù‡ Ø§ÙˆÙ„ Ø§Ù¾Ù„ÛŒÚ©ÛŒØ´Ù† Ù…Ø¯ÛŒØ±ÛŒØª Ø®Ø±Ø¬ Ø¯Ø§Ù†Ø´Ø¬ÙˆÛŒÛŒ"
+          body: "ÙØ§ÛŒÙ„ StudentExpense-v1.apk Ø±Ø§ Ø§Ø² Ù¾Ø§ÛŒÛŒÙ† Ù‡Ù…ÛŒÙ† ØµÙØ­Ù‡ Ø¯Ø§Ù†Ù„ÙˆØ¯ Ùˆ Ø±ÙˆÛŒ Ú¯ÙˆØ´ÛŒ Ù†ØµØ¨ Ú©Ù†ÛŒØ¯."
+          files: StudentExpense-v1.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
